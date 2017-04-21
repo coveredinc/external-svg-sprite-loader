@@ -48,11 +48,46 @@ function loader(content) {
     // Set the loader as not cacheable
     cacheable(false);
 
+    const { svgoOptions } = query;
+    // console.log(svgoOptions.plugins)
+    const uniqueIdsOption = {
+        cleanupIDs: {
+            minify: true,
+            prefix: loaderUtils.interpolateName(this, '[name]-', { content }),
+        },
+    };
+
+    svgoOptions.plugins.push(uniqueIdsOption);
+    // const plugins = svgoOptions.plugins.map((pluginOption) => {
+    //   let finalPluginOption = {};
+    //   Object.keys(pluginOption).forEach((key) => {
+    //     const val = pluginOption[key];
+    //     // console.log(key, val)
+    //     if (typeof val === 'object'){
+    //
+    //       finalPluginOption[key] = Object.keys(val).reduce((acc, subkey) => {
+    //         if(subkey === 'prefix'){
+    //           acc[subkey] = loaderUtils.interpolateName(this, val[subkey], {content});
+    //         } else {
+    //           acc[subkey] = val[subkey];
+    //         }
+    //         console.log(acc)
+    //         return acc;
+    //       }, {});
+    //     } else {
+    //       finalPluginOption[key] = val;
+    //     }
+    //   });
+    //   console.log(finalPluginOption)
+    //   return finalPluginOption;
+    // });
+    // console.log('a', plugins);
+
     // Start optimizing the SVG file
     imagemin
         .buffer(content, {
             plugins: [
-                imageminSvgo(query.svgoOptions),
+                imageminSvgo(svgoOptions),
             ],
         })
         .then((content) => {
